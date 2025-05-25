@@ -57,7 +57,7 @@ conference/
 
 1. 克隆项目：
 ```bash
-git clone <repository_url>
+git clone https://github.com/Coldfully/Coference.git
 cd conference
 ```
 
