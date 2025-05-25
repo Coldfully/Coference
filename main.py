@@ -31,7 +31,8 @@ if "mysql" not in DATABASE_URL and "sqlite" in DATABASE_URL:
 app = FastAPI(title="会议管理系统", description="简易的会议管理系统 API")
 
 #: 挂载静态文件目录
-app.mount("/static", StaticFiles(directory="static"), name="static")
+app.mount("/static", StaticFiles(directory=os.path.join(os.path.dirname(__file__), "static")), name="static")
+app.mount("/source", StaticFiles(directory=os.path.join(os.path.dirname(__file__), "source")), name="source")
 
 #: 配置模板目录
 templates = Jinja2Templates(directory="templates")
