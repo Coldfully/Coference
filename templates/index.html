@@ -1,0 +1,668 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>会议管理系统</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        .tab-content {
+            padding: 20px;
+        }
+        .card {
+            margin-bottom: 20px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container mt-4">
+        <h1 class="text-center mb-4">会议管理系统</h1>
+        
+        <!-- 导航标签 -->
+        <ul class="nav nav-tabs" id="myTab" role="tablist">
+            <li class="nav-item" role="presentation">
+                <button class="nav-link active" id="conferences-tab" data-bs-toggle="tab" data-bs-target="#conferences" type="button">会议管理</button>
+            </li>
+            <li class="nav-item" role="presentation">
+                <button class="nav-link" id="employees-tab" data-bs-toggle="tab" data-bs-target="#employees" type="button">员工管理</button>
+            </li>
+        </ul>
+
+        <!-- 标签内容 -->
+        <div class="tab-content" id="myTabContent">
+            <!-- 会议管理标签页 -->
+            <div class="tab-pane fade show active" id="conferences" role="tabpanel">
+                <div class="row mb-3">
+                    <div class="col">
+                        <button class="btn btn-primary" onclick="showAddConferenceModal()">添加会议</button>
+                    </div>
+                </div>
+                <div id="conferencesList" class="row"></div>
+            </div>
+
+            <!-- 员工管理标签页 -->
+            <div class="tab-pane fade" id="employees" role="tabpanel">
+                <div class="row mb-3">
+                    <div class="col">
+                        <button class="btn btn-primary" onclick="showAddEmployeeModal()">添加员工</button>
+                    </div>
+                </div>
+                <div id="employeesList" class="row"></div>
+            </div>
+
+            <!-- 会议预定标签页 -->
+            <div class="tab-pane fade" id="bookings" role="tabpanel">
+                <div class="row mb-3">
+                    <div class="col">
+                        <button class="btn btn-primary" onclick="showBookingModal()">预定会议</button>
+                    </div>
+                </div>
+                <div id="bookingsList" class="row"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 添加会议模态框 -->
+    <div class="modal fade" id="addConferenceModal" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">添加会议</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="addConferenceForm">
+                        <div class="mb-3">
+                            <label class="form-label">会议名称</label>
+                            <input type="text" class="form-control" name="name" required>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">日期</label>
+                            <input type="date" class="form-control" name="date" required>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">地点</label>
+                            <input type="text" class="form-control" name="location" required>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">描述</label>
+                            <textarea class="form-control" name="description"></textarea>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">取消</button>
+                    <button type="button" class="btn btn-primary" onclick="addConference()">添加</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 添加员工模态框 -->
+    <div class="modal fade" id="addEmployeeModal" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">添加员工</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="addEmployeeForm">
+                        <div class="mb-3">
+                            <label class="form-label">姓名</label>
+                            <input type="text" class="form-control" name="name" required>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">邮箱</label>
+                            <input type="email" class="form-control" name="email" required>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">部门</label>
+                            <input type="text" class="form-control" name="department" required>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">职位</label>
+                            <input type="text" class="form-control" name="position" required>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">电话</label>
+                            <input type="tel" class="form-control" name="phone">
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">取消</button>
+                    <button type="button" class="btn btn-primary" onclick="addEmployee()">添加</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 预定会议模态框 -->
+    <div class="modal fade" id="bookingModal" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">预定会议</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="bookingForm">
+                        <div class="mb-3">
+                            <label class="form-label">选择会议</label>
+                            <select class="form-select" name="conference_id" required></select>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">选择员工</label>
+                            <select class="form-select" name="employee_id" required></select>
+                        </div>
+        </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">取消</button>
+                    <button type="button" class="btn btn-primary" onclick="bookConference()">预定</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 修改会议模态框 -->
+    <div class="modal fade" id="editConferenceModal" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">修改会议</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="editConferenceForm">
+                        <input type="hidden" name="id">
+                        <div class="mb-3">
+                            <label class="form-label">会议名称</label>
+                            <input type="text" class="form-control" name="name" required>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">日期</label>
+                            <input type="date" class="form-control" name="date" required>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">地点</label>
+                            <input type="text" class="form-control" name="location" required>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">描述</label>
+                            <textarea class="form-control" name="description"></textarea>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">取消</button>
+                    <button type="button" class="btn btn-primary" onclick="updateConference()">保存</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 修改员工模态框 -->
+    <div class="modal fade" id="editEmployeeModal" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">修改员工</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="editEmployeeForm">
+                        <input type="hidden" name="id">
+                        <div class="mb-3">
+                            <label class="form-label">姓名</label>
+                            <input type="text" class="form-control" name="name" required>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">邮箱</label>
+                            <input type="email" class="form-control" name="email" required>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">部门</label>
+                            <input type="text" class="form-control" name="department" required>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">职位</label>
+                            <input type="text" class="form-control" name="position" required>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">电话</label>
+                            <input type="tel" class="form-control" name="phone">
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">取消</button>
+                    <button type="button" class="btn btn-primary" onclick="updateEmployee()">保存</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        // 全局变量
+        let conferences = [];
+        let employees = [];
+        let bookings = [];
+
+        // 页面加载完成后执行
+        document.addEventListener('DOMContentLoaded', function() {
+            loadConferences();
+            loadEmployees();
+            loadBookings();
+        });
+
+        // 加载会议列表
+        async function loadConferences() {
+            try {
+                const response = await fetch('/api/conferences');
+                conferences = await response.json();
+                displayConferences();
+            } catch (error) {
+                console.error('Error loading conferences:', error);
+            }
+        }
+
+        // 加载员工列表
+        async function loadEmployees() {
+            try {
+                const response = await fetch('/api/employees');
+                employees = await response.json();
+                displayEmployees();
+            } catch (error) {
+                console.error('Error loading employees:', error);
+            }
+        }
+
+        // 加载预定列表
+        async function loadBookings() {
+            try {
+                // 这里需要根据实际情况修改API
+                const response = await fetch('/api/conferences/bookings');
+                bookings = await response.json();
+                displayBookings();
+            } catch (error) {
+                console.error('Error loading bookings:', error);
+            }
+        }
+
+        // 显示会议列表
+        function displayConferences() {
+            const container = document.getElementById('conferencesList');
+            container.innerHTML = conferences.map(conf => `
+                <div class="col-md-4">
+                    <div class="card">
+                        <div class="card-body">
+                            <h5 class="card-title">${conf.name}</h5>
+                            <p class="card-text">
+                                日期: ${new Date(conf.date).toLocaleDateString()}<br>
+                                地点: ${conf.location}<br>
+                                描述: ${conf.description || '无'}<br>
+                                创建时间: ${new Date(conf.created_at).toLocaleString()}
+                            </p>
+                            <div class="btn-group">
+                                <button class="btn btn-info btn-sm" onclick="viewAttendees(${conf.id})">查看与会人员</button>
+                                <button class="btn btn-warning btn-sm" onclick="showEditConferenceModal(${conf.id})">修改</button>
+                                <button class="btn btn-danger btn-sm" onclick="deleteConference(${conf.id})">删除</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        // 显示员工列表
+        function displayEmployees() {
+            const container = document.getElementById('employeesList');
+            container.innerHTML = employees.map(emp => `
+                <div class="col-md-4">
+                    <div class="card">
+                        <div class="card-body">
+                            <h5 class="card-title">${emp.name}</h5>
+                            <p class="card-text">
+                                邮箱: ${emp.email}<br>
+                                部门: ${emp.department}<br>
+                                职位: ${emp.position}<br>
+                                电话: ${emp.phone || '未设置'}<br>
+                                创建时间: ${new Date(emp.created_at).toLocaleString()}
+                            </p>
+                            <div class="btn-group">
+                                <button class="btn btn-info btn-sm" onclick="viewEmployeeConferences(${emp.id})">查看预定会议</button>
+                                <button class="btn btn-warning btn-sm" onclick="showEditEmployeeModal(${emp.id})">修改</button>
+                                <button class="btn btn-danger btn-sm" onclick="deleteEmployee(${emp.id})">删除</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        // 显示预定列表
+        function displayBookings() {
+            const container = document.getElementById('bookingsList');
+            container.innerHTML = bookings.map(booking => {
+                const conference = conferences.find(c => c.id === booking.conference_id);
+                const employee = employees.find(e => e.id === booking.employee_id);
+                return `
+                    <div class="col-md-4">
+                        <div class="card">
+                            <div class="card-body">
+                                <h5 class="card-title">${conference?.name || '未知会议'}</h5>
+                                <p class="card-text">
+                                    预定人: ${employee?.name || '未知员工'}<br>
+                                    预定时间: ${new Date(booking.booking_date).toLocaleString()}
+                                </p>
+                                <button class="btn btn-danger btn-sm" onclick="cancelBooking(${booking.conference_id}, ${booking.employee_id})">取消预定</button>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        // 显示添加会议模态框
+        function showAddConferenceModal() {
+            const modal = new bootstrap.Modal(document.getElementById('addConferenceModal'));
+            modal.show();
+        }
+
+        // 显示添加员工模态框
+        function showAddEmployeeModal() {
+            const modal = new bootstrap.Modal(document.getElementById('addEmployeeModal'));
+            modal.show();
+        }
+
+        // 显示预定会议模态框
+        function showBookingModal() {
+            const modal = new bootstrap.Modal(document.getElementById('bookingModal'));
+            const conferenceSelect = document.querySelector('#bookingForm select[name="conference_id"]');
+            const employeeSelect = document.querySelector('#bookingForm select[name="employee_id"]');
+
+            // 填充会议选择框
+            conferenceSelect.innerHTML = conferences.map(conf => 
+                `<option value="${conf.id}">${conf.name}</option>`
+            ).join('');
+
+            // 填充员工选择框
+            employeeSelect.innerHTML = employees.map(emp => 
+                `<option value="${emp.id}">${emp.name}</option>`
+            ).join('');
+
+            modal.show();
+        }
+
+        // 添加会议
+        async function addConference() {
+            const form = document.getElementById('addConferenceForm');
+            const formData = new FormData(form);
+            const data = Object.fromEntries(formData.entries());
+
+            try {
+                const response = await fetch('/api/conferences', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(data),
+                });
+
+                if (response.ok) {
+                    const modal = bootstrap.Modal.getInstance(document.getElementById('addConferenceModal'));
+                    modal.hide();
+                    form.reset();
+                    await loadConferences();
+                } else {
+                    alert('添加会议失败');
+                }
+            } catch (error) {
+                console.error('Error adding conference:', error);
+                alert('添加会议失败');
+            }
+        }
+
+        // 添加员工
+        async function addEmployee() {
+            const form = document.getElementById('addEmployeeForm');
+            const formData = new FormData(form);
+            const data = Object.fromEntries(formData.entries());
+
+            try {
+                const response = await fetch('/api/employees', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(data),
+                });
+
+                if (response.ok) {
+                    const modal = bootstrap.Modal.getInstance(document.getElementById('addEmployeeModal'));
+                    modal.hide();
+                    form.reset();
+                    await loadEmployees();
+                } else {
+                    alert('添加员工失败');
+                }
+            } catch (error) {
+                console.error('Error adding employee:', error);
+                alert('添加员工失败');
+            }
+        }
+
+        // 预定会议
+        async function bookConference() {
+            const form = document.getElementById('bookingForm');
+            const formData = new FormData(form);
+            const conferenceId = formData.get('conference_id');
+            const employeeId = formData.get('employee_id');
+
+            try {
+                const response = await fetch(`/api/conferences/${conferenceId}/book`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ employee_id: employeeId }),
+                });
+
+                if (response.ok) {
+                    const modal = bootstrap.Modal.getInstance(document.getElementById('bookingModal'));
+                    modal.hide();
+                    form.reset();
+                    await loadBookings();
+                } else {
+                    alert('预定会议失败');
+                }
+            } catch (error) {
+                console.error('Error booking conference:', error);
+                alert('预定会议失败');
+            }
+        }
+
+        // 查看会议与会人员
+        async function viewAttendees(conferenceId) {
+            try {
+                const response = await fetch(`/api/conferences/${conferenceId}/attendees`);
+                const attendees = await response.json();
+                alert(`与会人员：\n${attendees.map(emp => emp.name).join('\n')}`);
+            } catch (error) {
+                console.error('Error loading attendees:', error);
+                alert('加载与会人员失败');
+            }
+        }
+
+        // 查看员工预定会议
+        async function viewEmployeeConferences(employeeId) {
+            try {
+                const response = await fetch(`/api/employees/${employeeId}/conferences`);
+                const employeeConferences = await response.json();
+                alert(`预定会议：\n${employeeConferences.map(conf => conf.name).join('\n')}`);
+            } catch (error) {
+                console.error('Error loading employee conferences:', error);
+                alert('加载员工预定会议失败');
+            }
+        }
+
+        // 显示修改会议模态框
+        function showEditConferenceModal(conferenceId) {
+            const conference = conferences.find(c => c.id === conferenceId);
+            if (!conference) return;
+
+            const form = document.getElementById('editConferenceForm');
+            form.elements['id'].value = conference.id;
+            form.elements['name'].value = conference.name;
+            form.elements['date'].value = conference.date;
+            form.elements['location'].value = conference.location;
+            form.elements['description'].value = conference.description || '';
+
+            const modal = new bootstrap.Modal(document.getElementById('editConferenceModal'));
+            modal.show();
+        }
+
+        // 显示修改员工模态框
+        function showEditEmployeeModal(employeeId) {
+            const employee = employees.find(e => e.id === employeeId);
+            if (!employee) return;
+
+            const form = document.getElementById('editEmployeeForm');
+            form.elements['id'].value = employee.id;
+            form.elements['name'].value = employee.name;
+            form.elements['email'].value = employee.email;
+            form.elements['department'].value = employee.department;
+            form.elements['position'].value = employee.position;
+            form.elements['phone'].value = employee.phone || '';
+
+            const modal = new bootstrap.Modal(document.getElementById('editEmployeeModal'));
+            modal.show();
+        }
+
+        // 更新会议
+        async function updateConference() {
+            const form = document.getElementById('editConferenceForm');
+            const formData = new FormData(form);
+            const data = Object.fromEntries(formData.entries());
+            const id = data.id;
+            delete data.id;
+
+            try {
+                const response = await fetch(`/api/conferences/${id}`, {
+                    method: 'PUT',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(data),
+                });
+
+                if (response.ok) {
+                    const modal = bootstrap.Modal.getInstance(document.getElementById('editConferenceModal'));
+                    modal.hide();
+                    form.reset();
+                    await loadConferences();
+                } else {
+                    alert('更新会议失败');
+                }
+            } catch (error) {
+                console.error('Error updating conference:', error);
+                alert('更新会议失败');
+            }
+        }
+
+        // 更新员工
+        async function updateEmployee() {
+            const form = document.getElementById('editEmployeeForm');
+            const formData = new FormData(form);
+            const data = Object.fromEntries(formData.entries());
+            const id = data.id;
+            delete data.id;
+
+            try {
+                const response = await fetch(`/api/employees/${id}`, {
+                    method: 'PUT',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(data),
+                });
+
+                if (response.ok) {
+                    const modal = bootstrap.Modal.getInstance(document.getElementById('editEmployeeModal'));
+                    modal.hide();
+                    form.reset();
+                    await loadEmployees();
+                } else {
+                    alert('更新员工失败');
+                }
+            } catch (error) {
+                console.error('Error updating employee:', error);
+                alert('更新员工失败');
+            }
+        }
+
+        // 删除会议
+        async function deleteConference(conferenceId) {
+            if (!confirm('确定要删除这个会议吗？')) return;
+
+            try {
+                const response = await fetch(`/api/conferences/${conferenceId}`, {
+                    method: 'DELETE',
+                });
+
+                if (response.ok) {
+                    await loadConferences();
+                } else {
+                    alert('删除会议失败');
+                }
+            } catch (error) {
+                console.error('Error deleting conference:', error);
+                alert('删除会议失败');
+            }
+        }
+
+        // 删除员工
+        async function deleteEmployee(employeeId) {
+            if (!confirm('确定要删除这个员工吗？')) return;
+
+            try {
+                const response = await fetch(`/api/employees/${employeeId}`, {
+                    method: 'DELETE',
+                });
+
+                if (response.ok) {
+                    await loadEmployees();
+                } else {
+                    alert('删除员工失败');
+                }
+            } catch (error) {
+                console.error('Error deleting employee:', error);
+                alert('删除员工失败');
+            }
+        }
+
+        // 取消预定
+        async function cancelBooking(conferenceId, employeeId) {
+            if (!confirm('确定要取消这个预定吗？')) return;
+
+            try {
+                const response = await fetch(`/api/conferences/${conferenceId}/bookings/${employeeId}`, {
+                    method: 'DELETE',
+                });
+
+                if (response.ok) {
+                    await loadBookings();
+                } else {
+                    alert('取消预定失败');
+                }
+            } catch (error) {
+                console.error('Error cancelling booking:', error);
+                alert('取消预定失败');
+            }
+        }
+    </script>
+</body>
+</html>
